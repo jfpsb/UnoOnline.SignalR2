@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33815.320
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoOnline.SignalR2", "UnoOnline.SignalR2.csproj", "{2463CDE0-74DE-4082-8269-67F386413324}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoOnline", "..\UnoOnline\UnoOnline.csproj", "{88C0E9FF-DFD4-4AC3-9188-0A66A5870A70}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2463CDE0-74DE-4082-8269-67F386413324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2463CDE0-74DE-4082-8269-67F386413324}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2463CDE0-74DE-4082-8269-67F386413324}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2463CDE0-74DE-4082-8269-67F386413324}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88C0E9FF-DFD4-4AC3-9188-0A66A5870A70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88C0E9FF-DFD4-4AC3-9188-0A66A5870A70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88C0E9FF-DFD4-4AC3-9188-0A66A5870A70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88C0E9FF-DFD4-4AC3-9188-0A66A5870A70}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {322593FD-828F-41F5-A15B-0B599930EBB3}
+	EndGlobalSection
+EndGlobal

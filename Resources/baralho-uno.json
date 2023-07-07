@@ -1,0 +1,272 @@
+[
+  {
+    "codigo": "amarelo-zero",
+    "imagem": "amarelo-0.png",
+    "quantidade": 1
+  },
+  {
+    "codigo": "amarelo-um",
+    "imagem": "amarelo-1.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "amarelo-dois",
+    "imagem": "amarelo-2.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "amarelo-tres",
+    "imagem": "amarelo-3.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "amarelo-quatro",
+    "imagem": "amarelo-4.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "amarelo-cinco",
+    "imagem": "amarelo-5.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "amarelo-seis",
+    "imagem": "amarelo-6.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "amarelo-sete",
+    "imagem": "amarelo-7.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "amarelo-oito",
+    "imagem": "amarelo-8.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "amarelo-nove",
+    "imagem": "amarelo-9.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "azul-zero",
+    "imagem": "azul-0.png",
+    "quantidade": 1
+  },
+  {
+    "codigo": "azul-um",
+    "imagem": "azul-1.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "azul-dois",
+    "imagem": "azul-2.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "azul-tres",
+    "imagem": "azul-3.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "azul-quatro",
+    "imagem": "azul-4.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "azul-cinco",
+    "imagem": "azul-5.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "azul-seis",
+    "imagem": "azul-6.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "azul-sete",
+    "imagem": "azul-7.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "azul-oito",
+    "imagem": "azul-8.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "azul-nove",
+    "imagem": "azul-9.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "verde-zero",
+    "imagem": "verde-0.png",
+    "quantidade": 1
+  },
+  {
+    "codigo": "verde-um",
+    "imagem": "verde-1.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "verde-dois",
+    "imagem": "verde-2.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "verde-tres",
+    "imagem": "verde-3.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "verde-quatro",
+    "imagem": "verde-4.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "verde-cinco",
+    "imagem": "verde-5.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "verde-seis",
+    "imagem": "verde-6.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "verde-sete",
+    "imagem": "verde-7.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "verde-oito",
+    "imagem": "verde-8.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "verde-nove",
+    "imagem": "verde-9.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "vermelho-zero",
+    "imagem": "vermelho-0.png",
+    "quantidade": 1
+  },
+  {
+    "codigo": "vermelho-um",
+    "imagem": "vermelho-1.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "vermelho-dois",
+    "imagem": "vermelho-2.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "vermelho-tres",
+    "imagem": "vermelho-3.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "vermelho-quatro",
+    "imagem": "vermelho-4.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "vermelho-cinco",
+    "imagem": "vermelho-5.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "vermelho-seis",
+    "imagem": "vermelho-6.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "vermelho-sete",
+    "imagem": "vermelho-7.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "vermelho-oito",
+    "imagem": "vermelho-8.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "vermelho-nove",
+    "imagem": "vermelho-9.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "bloqueio-amarelo",
+    "imagem": "bloqueio-amarelo.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "bloqueio-azul",
+    "imagem": "bloqueio-azul.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "bloqueio-verde",
+    "imagem": "bloqueio-verde.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "bloqueio-vermelho",
+    "imagem": "bloqueio-vermelho.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "coringa-cores",
+    "imagem": "coringa-cores.png",
+    "quantidade": 4
+  },
+  {
+    "codigo": "coringa-mais-quatro",
+    "imagem": "mais-quatro.png",
+    "quantidade": 4
+  },
+  {
+    "codigo": "coringa-mais-dois-amarelo",
+    "imagem": "mais-dois-amarelo.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "coringa-mais-dois-azul",
+    "imagem": "mais-dois-azul.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "coringa-mais-dois-verde",
+    "imagem": "mais-dois-verde.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "coringa-mais-dois-vermelho",
+    "imagem": "mais-dois-vermelho.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "inverter-amarelo",
+    "imagem": "inverter-amarelo.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "inverter-azul",
+    "imagem": "inverter-azul.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "inverter-verde",
+    "imagem": "inverter-verde.png",
+    "quantidade": 2
+  },
+  {
+    "codigo": "inverter-vermelho",
+    "imagem": "inverter-vermelho.png",
+    "quantidade": 2
+  }
+]
