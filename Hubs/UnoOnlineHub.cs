@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.SignalR;
 using UnoOnline.Model;
 
 namespace UnoOnline.SignalR2.Hubs
 {
     public class UnoOnlineHub : Hub
     {
-        private static Dictionary<Guid, Carta> baralho = new Dictionary<Guid, Carta>();
         private static StatusPartida? statusPartida;
 
         public UnoOnlineHub()
         {
-            
+
         }
 
         public override Task OnConnectedAsync()
@@ -20,92 +17,80 @@ namespace UnoOnline.SignalR2.Hubs
             if (statusPartida == null)
             {
                 statusPartida = new StatusPartida();
-                GeraBaralho();
+                statusPartida.GeraBaralho();
             }
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            Console.WriteLine("GONE");
+            Jogador jogador = statusPartida.Jogadores.Where(w => w.ConnectionId == Context.ConnectionId).FirstOrDefault();
+            if (jogador != null)
+            {
+                statusPartida.Jogadores.Remove(jogador);
+                Console.WriteLine($"Jogador {jogador.Nome} saiu da partida.");
+            }
             return base.OnDisconnectedAsync(exception);
         }
-
-        private void GeraBaralho()
+        public async Task EnviaUltimaCartaJogada(Carta carta, Jogador jogador)
         {
-            var ccs = JsonConvert.DeserializeObject<List<Carta>>(File.ReadAllText("Resources/baralho-uno.json"));
-            foreach (var c in ccs)
+            //Recupero a carta atualmente jogada por último
+            var ultCartaJogada = statusPartida.Baralho[statusPartida.UltimaCarta.Uuid];
+            ultCartaJogada.EstaEmBaralho = true;
+
+            //Ultima carta no status recebe a nova carta que foi jogada
+            statusPartida.UltimaCarta = carta;
+
+            var jg = statusPartida.Jogadores.Where(w => w.Uuid == jogador.Uuid).First();
+            var novaCarta = statusPartida.Baralho[carta.Uuid];
+
+            statusPartida.Jogadores.Find(jg).Value.Cartas.Remove(novaCarta);
+
+            switch (novaCarta.Tipo)
             {
-                for (int i = 0; i < c.Quantidade; i++)
-                {
-                    c.Uuid = Guid.NewGuid();
-
-                    string[] tipoArray = c.Codigo.Split('-');
-
-                    switch (tipoArray[0])
-                    {
-                        case "amarelo":
-                            c.Tipo = "numeral";
-                            c.Cor = "amarelo";
-                            break;
-                        case "verde":
-                            c.Tipo = "numeral";
-                            c.Cor = "verde";
-                            break;
-                        case "azul":
-                            c.Tipo = "numeral";
-                            c.Cor = "azul";
-                            break;
-                        case "vermelho":
-                            c.Tipo = "numeral";
-                            c.Cor = "vermelho";
-                            break;
-                        case "inverter":
-                            c.Tipo = tipoArray[0];
-                            c.Cor = tipoArray[1];
-                            break;
-                        default:
-                            c.Tipo = tipoArray[0];
-                            break;
-                    }
-
-                    baralho.Add(c.Uuid, c);
-                }
-            }
-        }
-        private IList<Carta> RetornaCartasDoBaralho(int quantCartas)
-        {
-            List<Carta> cartasSelecionadas = new List<Carta>();
-            List<Carta> cartasNoBaralho = baralho.Where(w => w.Value.EstaEmBaralho).Select(s => s.Value).ToList();
-
-            for (int i = 0; i < quantCartas; i++)
-            {
-                var carta = cartasNoBaralho[new Random().Next(cartasNoBaralho.Count)];
-                cartasSelecionadas.Add(carta);
+                case "bloqueio":
+                    statusPartida.PassarVez(2);
+                    break;
+                case "inverter":
+                    statusPartida.MudarSentido();
+                    statusPartida.PassarVez(1);
+                    break;
+                case "coringa-maisdois":
+                    statusPartida.PassarVez(2);
+                    break;
+                case "coringa-maisquatro":
+                    statusPartida.PassarVez(2);
+                    break;
+                default:
+                    statusPartida.PassarVez(1);
+                    break;
             }
 
-            return cartasSelecionadas;
+            await EnviaStatusPartida(statusPartida);
         }
-
         public async Task EnviaStatusPartida(StatusPartida statusPartida)
         {
             await Clients.All.SendAsync("AtualizarStatusPartida", statusPartida);
         }
         public async Task EntrarEmPartida(Jogador jogador)
         {
+            if (statusPartida.Jogadores.Count == 0)
+                statusPartida.UltimaCarta = statusPartida.RetornaCartasDoBaralho(1, true).FirstOrDefault();
+
             if (statusPartida.Jogadores.Count >= 4)
             {
                 await Clients.Caller.SendAsync("MensagemMessageBox", "A sala do jogo está cheia!");
                 return;
             }
 
+            foreach (var item in statusPartida.RetornaCartasDoBaralho(7, false))
+            {
+                jogador.Cartas.Add(item);
+            }
+
+            jogador.ConnectionId = Context.ConnectionId;
             statusPartida.AdicionaJogador(jogador);
-            await Clients.All.SendAsync("AtualizarStatusPartida", statusPartida);
+            await EnviaStatusPartida(statusPartida);
         }
-        //public async Task MensagemTeste(string txt)
-        //{
-        //    Console.WriteLine(txt);
-        //    await Clients.All.SendAsync("RecebeMensagemTeste", txt);
-        //}
     }
 }
