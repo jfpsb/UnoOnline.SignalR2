@@ -45,6 +45,7 @@ namespace UnoOnline.SignalR2.Hubs
             var novaCarta = statusPartida.Baralho[carta.Uuid];
 
             statusPartida.Jogadores.Find(jg).Value.Cartas.Remove(novaCarta);
+            var currentNode = statusPartida.Jogadores.Find(jg);
 
             switch (novaCarta.Tipo)
             {
@@ -56,9 +57,11 @@ namespace UnoOnline.SignalR2.Hubs
                     statusPartida.PassarVez(1);
                     break;
                 case "coringa-maisdois":
+                    statusPartida.ComprarCartas(statusPartida.RetornaProximoJogador(jg), 2);
                     statusPartida.PassarVez(2);
                     break;
                 case "coringa-maisquatro":
+                    statusPartida.ComprarCartas(statusPartida.RetornaProximoJogador(jg), 4);
                     statusPartida.PassarVez(2);
                     break;
                 default:
@@ -66,6 +69,12 @@ namespace UnoOnline.SignalR2.Hubs
                     break;
             }
 
+            await EnviaStatusPartida(statusPartida);
+        }
+        public async Task ComprarCarta(Jogador jogador)
+        {
+            var jg = statusPartida.Jogadores.Where(w => w.Uuid == jogador.Uuid).First();
+            statusPartida.ComprarCartas(jg, 1);
             await EnviaStatusPartida(statusPartida);
         }
         public async Task EnviaStatusPartida(StatusPartida statusPartida)
