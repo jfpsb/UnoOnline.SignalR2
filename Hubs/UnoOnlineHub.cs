@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using System.Timers;
 using UnoOnline.Model;
 
 namespace UnoOnline.SignalR2.Hubs
@@ -6,11 +7,12 @@ namespace UnoOnline.SignalR2.Hubs
     public class UnoOnlineHub : Hub
     {
         private static StatusPartida? statusPartida;
-
-        public UnoOnlineHub()
-        {
-
-        }
+        private System.Timers.Timer timerJogada;
+        private static DateTime expiraEm;
+        private DateTime inicioJogada;
+        private string _segundosAteExpiracaoEmString;
+        private int segundosTimer = 15;
+        internal static IHubCallerClients MyClients { get; set; }
 
         public override Task OnConnectedAsync()
         {
@@ -19,16 +21,17 @@ namespace UnoOnline.SignalR2.Hubs
                 statusPartida = new StatusPartida();
                 statusPartida.GeraBaralho();
             }
+            MyClients ??= Clients;
             return base.OnConnectedAsync();
         }
-
         public override Task OnDisconnectedAsync(Exception? exception)
         {
             Jogador jogador = statusPartida.Jogadores.Where(w => w.ConnectionId == Context.ConnectionId).FirstOrDefault();
             if (jogador != null)
             {
                 statusPartida.Jogadores.Remove(jogador);
-                Console.WriteLine($"Jogador {jogador.Nome} saiu da partida.");
+                EnviaEventosPartida($"Jogador {jogador.Nome} saiu da partida.");
+                EnviaStatusPartida(statusPartida);
             }
             return base.OnDisconnectedAsync(exception);
         }
@@ -43,43 +46,76 @@ namespace UnoOnline.SignalR2.Hubs
 
             var jg = statusPartida.Jogadores.Where(w => w.Uuid == jogador.Uuid).First();
             var novaCarta = statusPartida.Baralho[carta.Uuid];
+            novaCarta.Cor = carta.Cor;
 
-            statusPartida.Jogadores.Find(jg).Value.Cartas.Remove(novaCarta);
+            //Testa se jogador gritou Uno
+            if (jogador.Cartas.Count == 2 && !jogador.GritouUno)
+            {
+                //Não gritou Uno. Toma punição e compra duas cartas.
+                statusPartida.ComprarCartas(jg, 2);
+                await EnviaEventosPartida($"Jogador {jogador.Nome} não gritou Uno e foi punido com mais duas cartas.");
+            }
+
             var currentNode = statusPartida.Jogadores.Find(jg);
+            currentNode.Value.Cartas.Remove(novaCarta);
+
+            if (currentNode.Value.Cartas.Count == 0)
+            {
+                await EnviaEventosPartida($"Jogador {jogador.Nome} venceu a partida.");
+                await Clients.All.SendAsync("AcabouPartida", jogador);
+                DestroiTimer();
+                return;
+            }
+
+            var proxJg = statusPartida.RetornaProximoJogador(jg);
 
             switch (novaCarta.Tipo)
             {
                 case "bloqueio":
-                    statusPartida.PassarVez(2);
+                    statusPartida.PassarVez(2, jg);
+                    await EnviaEventosPartida($"{jogador.Nome} bloqueou a vez de {proxJg.Nome}.");
                     break;
                 case "inverter":
                     statusPartida.MudarSentido();
-                    statusPartida.PassarVez(1);
+                    statusPartida.PassarVez(1, jg);
+                    await EnviaEventosPartida($"{jogador.Nome} inverteu a ordem do jogo.");
                     break;
                 case "coringa-maisdois":
-                    statusPartida.ComprarCartas(statusPartida.RetornaProximoJogador(jg), 2);
-                    statusPartida.PassarVez(2);
+                    statusPartida.ComprarCartas(proxJg, 2);
+                    statusPartida.PassarVez(2, jg);
+                    await EnviaEventosPartida($"{jogador.Nome} comprou duas cartas para {proxJg.Nome}.");
                     break;
                 case "coringa-maisquatro":
                     statusPartida.ComprarCartas(statusPartida.RetornaProximoJogador(jg), 4);
-                    statusPartida.PassarVez(2);
+                    statusPartida.PassarVez(2, jg);
+                    await EnviaEventosPartida($"{jogador.Nome} comprou quatro cartas para {proxJg.Nome} e escolheu a cor {novaCarta.Cor.ToUpper()}.");
+                    break;
+                case "coringa-cores":
+                    await EnviaEventosPartida($"{jogador.Nome} escolheu a cor {novaCarta.Cor.ToUpper()}.");
+                    statusPartida.PassarVez(1, jg);
                     break;
                 default:
-                    statusPartida.PassarVez(1);
+                    statusPartida.PassarVez(1, jg);
                     break;
             }
 
+            expiraEm = DateTime.Now.AddSeconds(segundosTimer);
             await EnviaStatusPartida(statusPartida);
         }
         public async Task ComprarCarta(Jogador jogador)
         {
+            expiraEm = DateTime.Now.AddSeconds(segundosTimer);
             var jg = statusPartida.Jogadores.Where(w => w.Uuid == jogador.Uuid).First();
             statusPartida.ComprarCartas(jg, 1);
             await EnviaStatusPartida(statusPartida);
         }
+        public async Task EnviaEventosPartida(string evento)
+        {
+            await MyClients.All.SendAsync("RecebeEventoJogo", evento);
+        }
         public async Task EnviaStatusPartida(StatusPartida statusPartida)
         {
-            await Clients.All.SendAsync("AtualizarStatusPartida", statusPartida);
+            await MyClients.All.SendAsync("AtualizarStatusPartida", statusPartida);
         }
         public async Task EntrarEmPartida(Jogador jogador)
         {
@@ -92,14 +128,70 @@ namespace UnoOnline.SignalR2.Hubs
                 return;
             }
 
-            foreach (var item in statusPartida.RetornaCartasDoBaralho(7, false))
+            foreach (var item in statusPartida.RetornaCartasDoBaralho(3, false))
             {
                 jogador.Cartas.Add(item);
             }
 
             jogador.ConnectionId = Context.ConnectionId;
             statusPartida.AdicionaJogador(jogador);
+
+            if (statusPartida.Jogadores.Count == 2)
+                IniciaTimer();
+
+            await EnviaEventosPartida($"Jogador {jogador.Nome} entrou na partida!");
             await EnviaStatusPartida(statusPartida);
+        }
+        private void IniciaTimer()
+        {
+            expiraEm = DateTime.Now.AddSeconds(segundosTimer);
+            timerJogada = new System.Timers.Timer(1);
+            timerJogada.AutoReset = true;
+            timerJogada.Enabled = true;
+            timerJogada.Elapsed += TimerJogada_Elapsed;
+        }
+        private void DestroiTimer()
+        {
+            timerJogada.Stop();
+            timerJogada.Dispose();
+        }
+        private async void TimerJogada_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (e.SignalTime > expiraEm)
+            {
+                statusPartida.PassarVez(1, statusPartida.JogadorDaVez);
+                expiraEm = DateTime.Now.AddSeconds(segundosTimer);
+                await EnviaEventosPartida($"{statusPartida.JogadorDaVez.Nome} não jogou a tempo e perdeu a vez.");
+                await EnviaStatusPartida(statusPartida);
+            }
+            else
+            {
+                var horaAtual = DateTime.Now.TimeOfDay;
+                var timeSpan1 = new TimeSpan(inicioJogada.Hour, inicioJogada.Minute, inicioJogada.Second);
+                var timeSpan2 = new TimeSpan(expiraEm.Hour, expiraEm.Minute, expiraEm.Second);
+
+                if (horaAtual >= timeSpan1 && horaAtual <= timeSpan2)
+                {
+                    var timeSpanRestante = timeSpan2.Subtract(horaAtual);
+                    SegundosAteExpiracaoEmString = timeSpanRestante.ToString(@"ss\.f");
+                }
+            }
+
+            Console.WriteLine(expiraEm);
+            await MyClients.All.SendAsync("AtualizarTimer", SegundosAteExpiracaoEmString);
+        }
+
+        public string SegundosAteExpiracaoEmString
+        {
+            get
+            {
+                return _segundosAteExpiracaoEmString;
+            }
+
+            set
+            {
+                _segundosAteExpiracaoEmString = value;
+            }
         }
     }
 }
