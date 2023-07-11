@@ -30,6 +30,11 @@ namespace UnoOnline.SignalR2.Hubs
             Jogador jogador = statusPartida.Jogadores.Where(w => w.ConnectionId == Context.ConnectionId).FirstOrDefault();
             if (jogador != null)
             {
+                //Jogador da vez saiu da partida, passo a vez para proximo jogador
+                if(statusPartida.JogadorDaVez.Uuid == jogador.Uuid)
+                {
+                    statusPartida.PassarVez(1, jogador);
+                }
                 statusPartida.Jogadores.Remove(jogador);
                 EnviaEventosPartida($"Jogador {jogador.Nome} saiu da partida.");
                 EnviaStatusPartida(statusPartida);
@@ -161,8 +166,11 @@ namespace UnoOnline.SignalR2.Hubs
         }
         private void DestroiTimer()
         {
-            timerJogada.Stop();
-            timerJogada.Dispose();
+            if (timerJogada != null)
+            {
+                timerJogada.Stop();
+                timerJogada.Dispose();
+            }
         }
         private async void TimerJogada_Elapsed(object sender, ElapsedEventArgs e)
         {
