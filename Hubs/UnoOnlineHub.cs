@@ -31,7 +31,7 @@ namespace UnoOnline.SignalR2.Hubs
             if (jogador != null)
             {
                 //Jogador da vez saiu da partida, passo a vez para proximo jogador
-                if(statusPartida.JogadorDaVez.Uuid == jogador.Uuid)
+                if (statusPartida.JogadorDaVez.Uuid == jogador.Uuid)
                 {
                     statusPartida.PassarVez(1, jogador);
                 }
